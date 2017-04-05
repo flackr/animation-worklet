@@ -1,38 +1,1395 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Spec proposal</title>
-    <script src="https://www.w3.org/Tools/respec/respec-w3c-common" class="remove"></script>
-    <script class='remove'>
-      // See https://github.com/w3c/respec/wiki/ for how to configure ReSpec
-      var respecConfig = {
-        specStatus: "CG-DRAFT",
-        shortName: "animation-worklet",
-        editors: [{
-          name: "Yoav Weiss"
-        }]
-      };
-    </script>
-  </head>
-  <body>
-    <section id="abstract">
-      <p>
-        This specification does neat stuff.
-      </p>
-    </section>
-    <section id="sotd">
-      <p>
-        This is an unofficial proposal.
-      </p>
-    </section>
+<!doctype html><html lang="en">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <title>CSS Animation Worklet API</title>
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+  <meta content="ED" name="w3c-status">
+  <link href="../default.css" rel="stylesheet" type="text/css">
+  <link href="../csslogo.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="https://www.w3.org/StyleSheets/TR/2016/W3C-ED" rel="stylesheet" type="text/css">
+  <meta content="Bikeshed version fa6d32dea6b39d19cbb9dd6d5e69f189e8bdd53f" name="generator">
+<style>/* style-md-lists */
 
-    <section id="introduction">
-      <h2>Introduction</h2>
-      <p>
-        See <a href="https://github.com/w3c/respec/wiki/User's-Guide">ReSpec's user guide</a>
-        for how toget started!
-      </p>
-    </section>
-  </body>
-</html>
+            /* This is a weird hack for me not yet following the commonmark spec
+               regarding paragraph and lists. */
+            [data-md] > :first-child {
+                margin-top: 0;
+            }
+            [data-md] > :last-child {
+                margin-bottom: 0;
+            }</style>
+<style>/* style-selflinks */
+
+            .heading, .issue, .note, .example, li, dt {
+                position: relative;
+            }
+            a.self-link {
+                position: absolute;
+                top: 0;
+                left: calc(-1 * (3.5rem - 26px));
+                width: calc(3.5rem - 26px);
+                height: 2em;
+                text-align: center;
+                border: none;
+                transition: opacity .2s;
+                opacity: .5;
+            }
+            a.self-link:hover {
+                opacity: 1;
+            }
+            .heading > a.self-link {
+                font-size: 83%;
+            }
+            li > a.self-link {
+                left: calc(-1 * (3.5rem - 26px) - 2em);
+            }
+            dfn > a.self-link {
+                top: auto;
+                left: auto;
+                opacity: 0;
+                width: 1.5em;
+                height: 1.5em;
+                background: gray;
+                color: white;
+                font-style: normal;
+                transition: opacity .2s, background-color .2s, color .2s;
+            }
+            dfn:hover > a.self-link {
+                opacity: 1;
+            }
+            dfn > a.self-link:hover {
+                color: black;
+            }
+
+            a.self-link::before            { content: "¶"; }
+            .heading > a.self-link::before { content: "§"; }
+            dfn > a.self-link::before      { content: "#"; }</style>
+<style>/* style-counters */
+
+            body {
+                counter-reset: example figure issue;
+            }
+            .issue {
+                counter-increment: issue;
+            }
+            .issue:not(.no-marker)::before {
+                content: "Issue " counter(issue);
+            }
+
+            .example {
+                counter-increment: example;
+            }
+            .example:not(.no-marker)::before {
+                content: "Example " counter(example);
+            }
+            .invalid.example:not(.no-marker)::before,
+            .illegal.example:not(.no-marker)::before {
+                content: "Invalid Example" counter(example);
+            }
+
+            figcaption {
+                counter-increment: figure;
+            }
+            figcaption:not(.no-marker)::before {
+                content: "Figure " counter(figure) " ";
+            }</style>
+<style>/* style-autolinks */
+
+            .css.css, .property.property, .descriptor.descriptor {
+                color: #005a9c;
+                font-size: inherit;
+                font-family: inherit;
+            }
+            .css::before, .property::before, .descriptor::before {
+                content: "‘";
+            }
+            .css::after, .property::after, .descriptor::after {
+                content: "’";
+            }
+            .property, .descriptor {
+                /* Don't wrap property and descriptor names */
+                white-space: nowrap;
+            }
+            .type { /* CSS value <type> */
+                font-style: italic;
+            }
+            pre .property::before, pre .property::after {
+                content: "";
+            }
+            [data-link-type="property"]::before,
+            [data-link-type="propdesc"]::before,
+            [data-link-type="descriptor"]::before,
+            [data-link-type="value"]::before,
+            [data-link-type="function"]::before,
+            [data-link-type="at-rule"]::before,
+            [data-link-type="selector"]::before,
+            [data-link-type="maybe"]::before {
+                content: "‘";
+            }
+            [data-link-type="property"]::after,
+            [data-link-type="propdesc"]::after,
+            [data-link-type="descriptor"]::after,
+            [data-link-type="value"]::after,
+            [data-link-type="function"]::after,
+            [data-link-type="at-rule"]::after,
+            [data-link-type="selector"]::after,
+            [data-link-type="maybe"]::after {
+                content: "’";
+            }
+
+            [data-link-type].production::before,
+            [data-link-type].production::after,
+            .prod [data-link-type]::before,
+            .prod [data-link-type]::after {
+                content: "";
+            }
+
+            [data-link-type=element],
+            [data-link-type=element-attr] {
+                font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+                font-size: .9em;
+            }
+            [data-link-type=element]::before { content: "<" }
+            [data-link-type=element]::after  { content: ">" }
+
+            [data-link-type=biblio] {
+                white-space: pre;
+            }</style>
+<style>/* style-dfn-panel */
+
+        .dfn-panel {
+            position: absolute;
+            z-index: 35;
+            height: auto;
+            width: -webkit-fit-content;
+            width: fit-content;
+            max-width: 300px;
+            max-height: 500px;
+            overflow: auto;
+            padding: 0.5em 0.75em;
+            font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+            background: #DDDDDD;
+            color: black;
+            border: outset 0.2em;
+        }
+        .dfn-panel:not(.on) { display: none; }
+        .dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
+        .dfn-panel > b { display: block; }
+        .dfn-panel a { color: black; }
+        .dfn-panel a:not(:hover) { text-decoration: none !important; border-bottom: none !important; }
+        .dfn-panel > b + b { margin-top: 0.25em; }
+        .dfn-panel ul { padding: 0; }
+        .dfn-panel li { list-style: inside; }
+        .dfn-panel.activated {
+            display: inline-block;
+            position: fixed;
+            left: .5em;
+            bottom: 2em;
+            margin: 0 auto;
+            max-width: calc(100vw - 1.5em - .4em - .5em);
+            max-height: 30vh;
+        }
+
+        .dfn-paneled { cursor: pointer; }
+        </style>
+<style>/* style-syntax-highlighting */
+pre.idl.highlight { color: #708090; }
+        .highlight:not(.idl) { background: hsl(24, 20%, 95%); }
+        code.highlight { padding: .1em; border-radius: .3em; }
+        pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
+        .highlight .c { color: #708090 } /* Comment */
+        .highlight .k { color: #990055 } /* Keyword */
+        .highlight .l { color: #000000 } /* Literal */
+        .highlight .n { color: #0077aa } /* Name */
+        .highlight .o { color: #999999 } /* Operator */
+        .highlight .p { color: #999999 } /* Punctuation */
+        .highlight .cm { color: #708090 } /* Comment.Multiline */
+        .highlight .cp { color: #708090 } /* Comment.Preproc */
+        .highlight .c1 { color: #708090 } /* Comment.Single */
+        .highlight .cs { color: #708090 } /* Comment.Special */
+        .highlight .kc { color: #990055 } /* Keyword.Constant */
+        .highlight .kd { color: #990055 } /* Keyword.Declaration */
+        .highlight .kn { color: #990055 } /* Keyword.Namespace */
+        .highlight .kp { color: #990055 } /* Keyword.Pseudo */
+        .highlight .kr { color: #990055 } /* Keyword.Reserved */
+        .highlight .kt { color: #990055 } /* Keyword.Type */
+        .highlight .ld { color: #000000 } /* Literal.Date */
+        .highlight .m { color: #000000 } /* Literal.Number */
+        .highlight .s { color: #a67f59 } /* Literal.String */
+        .highlight .na { color: #0077aa } /* Name.Attribute */
+        .highlight .nc { color: #0077aa } /* Name.Class */
+        .highlight .no { color: #0077aa } /* Name.Constant */
+        .highlight .nd { color: #0077aa } /* Name.Decorator */
+        .highlight .ni { color: #0077aa } /* Name.Entity */
+        .highlight .ne { color: #0077aa } /* Name.Exception */
+        .highlight .nf { color: #0077aa } /* Name.Function */
+        .highlight .nl { color: #0077aa } /* Name.Label */
+        .highlight .nn { color: #0077aa } /* Name.Namespace */
+        .highlight .py { color: #0077aa } /* Name.Property */
+        .highlight .nt { color: #669900 } /* Name.Tag */
+        .highlight .nv { color: #222222 } /* Name.Variable */
+        .highlight .ow { color: #999999 } /* Operator.Word */
+        .highlight .mb { color: #000000 } /* Literal.Number.Bin */
+        .highlight .mf { color: #000000 } /* Literal.Number.Float */
+        .highlight .mh { color: #000000 } /* Literal.Number.Hex */
+        .highlight .mi { color: #000000 } /* Literal.Number.Integer */
+        .highlight .mo { color: #000000 } /* Literal.Number.Oct */
+        .highlight .sb { color: #a67f59 } /* Literal.String.Backtick */
+        .highlight .sc { color: #a67f59 } /* Literal.String.Char */
+        .highlight .sd { color: #a67f59 } /* Literal.String.Doc */
+        .highlight .s2 { color: #a67f59 } /* Literal.String.Double */
+        .highlight .se { color: #a67f59 } /* Literal.String.Escape */
+        .highlight .sh { color: #a67f59 } /* Literal.String.Heredoc */
+        .highlight .si { color: #a67f59 } /* Literal.String.Interpol */
+        .highlight .sx { color: #a67f59 } /* Literal.String.Other */
+        .highlight .sr { color: #a67f59 } /* Literal.String.Regex */
+        .highlight .s1 { color: #a67f59 } /* Literal.String.Single */
+        .highlight .ss { color: #a67f59 } /* Literal.String.Symbol */
+        .highlight .vc { color: #0077aa } /* Name.Variable.Class */
+        .highlight .vg { color: #0077aa } /* Name.Variable.Global */
+        .highlight .vi { color: #0077aa } /* Name.Variable.Instance */
+        .highlight .il { color: #000000 } /* Literal.Number.Integer.Long */
+        </style>
+ <body class="h-entry">
+  <div class="head">
+   <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72"> </a> </p>
+   <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Editor’s Draft, <time class="dt-updated" datetime="2017-04-05">5 April 2017</time></span></h2>
+   <div data-fill-with="spec-metadata">
+    <dl>
+     <dt>This version:
+     <dd><a class="u-url" href="https://drafts.css-houdini.org/css-animation-api-1/">https://drafts.css-houdini.org/css-animation-api-1/</a>
+     <dt>Previous Versions:
+     <dd><a href="" rel="previous"></a>
+     <dt>Feedback:
+     <dd><span><a href="mailto:public-houdini@w3.org?subject=%5Bcss-animation-api%5D%20YOUR%20TOPIC%20HERE">public-houdini@w3.org</a> with subject line “<kbd>[css-animation-api] <i data-lt="">… message topic …</i></kbd>” (<a href="http://lists.w3.org/Archives/Public/public-houdini/" rel="discussion">archives</a>)</span>
+     <dt>Issue Tracking:
+     <dd><a href="https://github.com/w3c/css-houdini-drafts/issues/">GitHub</a>
+     <dd><a href="#issues-index">Inline In Spec</a>
+     <dt class="editor">Editors:
+     <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
+     <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:flackr@chromium.org">Robert Flack</a>
+     <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:smcgruer@chromium.org">Stephen McGruer</a>
+     <dd class="editor p-author h-card vcard"><span class="p-name fn"></span>
+    </dl>
+   </div>
+   <div data-fill-with="warning"></div>
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2017 <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>). W3C <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply. </p>
+   <hr title="Separator for header">
+  </div>
+  <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+  <div class="p-summary" data-fill-with="abstract"></div>
+  <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
+  <div data-fill-with="status">
+   <p> This is a public copy of the editors’ draft.
+	It is provided for discussion only and may change at any moment.
+	Its publication here does not imply endorsement of its contents by W3C.
+	Don’t cite this document other than as work in progress. </p>
+   <p> <a href="https://github.com/w3c/css-houdini-drafts/issues">GitHub Issues</a> are preferred for discussion of this specification.
+	When filing an issue, please put the text “css-animation-api” in the title,
+	preferably like this:
+	“[css-animation-api] <i>…summary of comment…</i>”.
+	All issues and comments are <a href="https://lists.w3.org/Archives/Public/public-houdini-archive/">archived</a>. </p>
+   <p> This document was produced by the <a href="http://www.w3.org/Style/CSS/members">CSS Working Group</a> (part of the <a href="http://www.w3.org/Style/">Style Activity</a>). </p>
+   <p> This document was produced by a group operating under
+	the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 W3C Patent Policy</a>.
+	W3C maintains a <a href="http://www.w3.org/2004/01/pp-impl/32061/status" rel="disclosure">public list of any patent disclosures</a> made in connection with the deliverables of the group;
+	that page also includes instructions for disclosing a patent.
+	An individual who has actual knowledge of a patent which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the W3C Patent Policy</a>. </p>
+   <p> This document is governed by the <a href="https://www.w3.org/2017/Process-20170301/" id="w3c_process_revision">1 March 2017 W3C Process Document</a>. </p>
+   <p></p>
+  </div>
+  <div data-fill-with="at-risk"></div>
+  <nav data-fill-with="table-of-contents" id="toc">
+   <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
+   <ol class="toc" role="directory">
+    <li><a href="#intro"><span class="secno">1</span> <span class="content">Introduction</span></a>
+    <li><a href="#animation-worklet-desc"><span class="secno">2</span> <span class="content">Animation Worklet</span></a>
+    <li><a href="#concepts"><span class="secno">3</span> <span class="content">Concepts</span></a>
+    <li><a href="#registering-animator-definition"><span class="secno">4</span> <span class="content">Registering an Animator Definition</span></a>
+    <li><a href="#creating-animator"><span class="secno">5</span> <span class="content">Creating an Animator</span></a>
+    <li><a href="#creating-element-proxy"><span class="secno">6</span> <span class="content">Creating an Element Proxy</span></a>
+    <li><a href="#requesting-animation-frames"><span class="secno">7</span> <span class="content">Requesting Animation Frames</span></a>
+    <li><a href="#running-animators"><span class="secno">8</span> <span class="content">Running Animators</span></a>
+    <li><a href="#closing-animator"><span class="secno">9</span> <span class="content">Closing an Animator</span></a>
+    <li><a href="#css-animator-notation"><span class="secno">10</span> <span class="content">CSS Animator Notation</span></a>
+    <li><a href="#effect-stack"><span class="secno">11</span> <span class="content">Effect Stack</span></a>
+    <li><a href="#security-considerations"><span class="secno">12</span> <span class="content">Security Considerations</span></a>
+    <li><a href="#privacy-considerations"><span class="secno">13</span> <span class="content">Privacy Considerations</span></a>
+    <li>
+     <a href="#examples"><span class="secno">14</span> <span class="content">Examples</span></a>
+     <ol class="toc">
+      <li><a href="#example-1"><span class="secno">14.1</span> <span class="content">Example 1: A fade-in animation with spring timing.</span></a>
+     </ol>
+    <li>
+     <a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
+     <ol class="toc">
+      <li><a href="#conventions"><span class="secno"></span> <span class="content"> Document conventions</span></a>
+      <li><a href="#conformance-classes"><span class="secno"></span> <span class="content"> Conformance classes</span></a>
+      <li>
+       <a href="#partial"><span class="secno"></span> <span class="content"> Partial implementations</span></a>
+       <ol class="toc">
+        <li><a href="#conform-future-proofing"><span class="secno"></span> <span class="content"> Implementations of Unstable and Proprietary Features</span></a>
+       </ol>
+      <li><a href="#testing"><span class="secno"></span> <span class="content"> Non-experimental implementations</span></a>
+     </ol>
+    <li>
+     <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
+     <ol class="toc">
+      <li><a href="#index-defined-here"><span class="secno"></span> <span class="content">Terms defined by this specification</span></a>
+      <li><a href="#index-defined-elsewhere"><span class="secno"></span> <span class="content">Terms defined by reference</span></a>
+     </ol>
+    <li>
+     <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
+     <ol class="toc">
+      <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
+      <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
+     </ol>
+    <li><a href="#property-index"><span class="secno"></span> <span class="content">Property Index</span></a>
+    <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
+    <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
+   </ol>
+  </nav>
+  <main>
+   <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#intro"></a></h2>
+    This document introduces a new primitive for creating scroll-linked and other high performance 
+procedural animations on the web. For details on the rational and motivation see <a data-link-type="biblio" href="#biblio-explainer">[explainer]</a>. 
+   <p>The <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-1">Animation Worklet</a> provides a method to create scripted animations that can mutate a set
+of user visible animatable attributes. The API is designed to make it possible such animations to
+run in performance critical parts of rendering pipeline. Although the specification does not
+require certain performance guarantees (e.g., running in sync with every frame produced or in
+isolation from main thread) but the API is designed to facilitate and encourage this.</p>
+   <p><strong>Relationship to Web Animation API</strong>: Animations running on <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-2">Animation
+Worklet</a> do not necessarily run on main thread and thus are not synchronized with <a data-link-type="dfn" href="https://www.w3.org/TR/web-animations/#the-documents-default-timeline">default
+document timeline</a>. At the moment we do not expose any API to start, stop, compose or otherwise
+control these animations from outside the worklet however our plan is to leverage existing web 
+animation APIs such as Element::getAnimations().</p>
+   <p class="note" role="note"><span>Note:</span> <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
+scrolling input) to these animations so that authors can create jank-free input driven animations
+which are not really possible today.</p>
+   <h2 class="heading settled" data-level="2" id="animation-worklet-desc"><span class="secno">2. </span><span class="content">Animation Worklet</span><a class="self-link" href="#animation-worklet-desc"></a></h2>
+    <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-worklet">Animation Worklet</dfn> is a <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a></code> responsible for all classes related to custom
+animations. The worklet can be accessed via <code class="idl"><a data-link-type="idl" href="#dom-window-animationworklet" id="ref-for-dom-window-animationworklet-1">animationWorklet</a></code> attribute. 
+   <p>The <code class="idl"><a data-link-type="idl" href="#dom-window-animationworklet" id="ref-for-dom-window-animationworklet-2">animationWorklet</a></code>'s <a data-link-type="dfn" href="https://drafts.css-houdini.org/worklets/#worklet-global-scope-type">worklet global scope type</a> is <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-1">AnimationWorkletGlobalScope</a></code>.</p>
+<pre class="idl highlight def"><span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="animationworklet">AnimationWorklet</dfn> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <dfn class="nv idl-code" data-dfn-for="AnimationWorklet" data-dfn-type="method" data-export="" data-lt="import(moduleURL)" id="dom-animationworklet-import">import<a class="self-link" href="#dom-animationworklet-import"></a></dfn>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <dfn class="nv idl-code" data-dfn-for="AnimationWorklet/import(moduleURL)" data-dfn-type="argument" data-export="" id="dom-animationworklet-import-moduleurl-moduleurl">moduleURL<a class="self-link" href="#dom-animationworklet-import-moduleurl-moduleurl"></a></dfn>);
+};
+
+<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a> {
+    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet" id="ref-for-animationworklet-1">AnimationWorklet</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="Window" data-dfn-type="attribute" data-export="" data-readonly="" data-type="AnimationWorklet" id="dom-window-animationworklet">animationWorklet</dfn>;
+};
+</pre>
+<pre class="idl highlight def"><span class="kt">callback</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="callback" data-export="" id="callbackdef-voidfunction">VoidFunction</dfn> = <span class="kt">void</span> ();
+
+[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">AnimationWorklet</span>]
+<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="animationworkletglobalscope">AnimationWorkletGlobalScope</dfn> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
+    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator-1">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <dfn class="nv idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export="" id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-name">name<a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"></a></dfn>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction" id="ref-for-callbackdef-voidfunction-1">VoidFunction</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export="" id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">animatorCtor</dfn>);
+};
+</pre>
+   <div class="note" role="note">
+     Note: This is how the class should look. 
+<pre class="lang-javascript highlight"><span class="kr">class</span> FooAnimator <span class="p">{</span>
+    <span class="kr">static</span> get inputProperties<span class="p">(</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="s1">'--foo'</span><span class="p">]</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kr">static</span> get outputProperties<span class="p">(</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">;</span> <span class="p">}</span>
+
+    animate<span class="p">(</span>root<span class="p">,</span> children<span class="p">,</span> timeline<span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Animation frame logic goes here
+</span>    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+   </div>
+   <h2 class="heading settled" data-level="3" id="concepts"><span class="secno">3. </span><span class="content">Concepts</span><a class="self-link" href="#concepts"></a></h2>
+    A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-definition">animator definition</dfn> describes an author defined animation which can be referenced by
+an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-1">animator instance</a>. It consists of: 
+   <ul>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="class-constructor">class constructor</dfn>.</p>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animate-function">animate function</dfn>.</p>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-input-property-list">animator input property list</dfn>.</p>
+    <li data-md="">
+     <p>A <dfn data-dfn-type="dfn" data-noexport="" id="animator-output-property-list">animator output property list<a class="self-link" href="#animator-output-property-list"></a></dfn>.</p>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-root-input-property-list">animator root input property list</dfn>.</p>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-root-output-property-list">animator root output property list</dfn>.</p>
+   </ul>
+   <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-instance">animator instance</dfn> describes a fully realized custom animation instance in the worklet
+context and links an <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-1">animator definition</a> with the instance specific state such as its element
+proxies. It consists of:</p>
+   <ul>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-name">animator name</dfn>.</p>
+    <li data-md="">
+     <p>An <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-1">animation requested flag</a>.</p>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="root-element-proxy">root element proxy</dfn>.</p>
+    <li data-md="">
+     <p>A list of associated <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="children-element-proxies">children element proxies</dfn>.</p>
+   </ul>
+   <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="element-proxy">element proxy</dfn> defines a handle to an element which can be used to read or
+write its explicitly exposed animatable attributes. It consists of:</p>
+   <ul>
+    <li data-md="">
+     <p>An <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-2">animator instance</a>.</p>
+    <li data-md="">
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="proxied-element">proxied element</dfn>.</p>
+    <li data-md="">
+     <p>A read only map of proxied input properties their values.</p>
+    <li data-md="">
+     <p>A map of proxies output properties to their values.</p>
+   </ul>
+   <h2 class="heading settled" data-level="4" id="registering-animator-definition"><span class="secno">4. </span><span class="content">Registering an Animator Definition</span><a class="self-link" href="#registering-animator-definition"></a></h2>
+    The <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-2">AnimationWorkletGlobalScope</a></code> has a <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-name-to-animator-definition-map">animator name to animator definition map</dfn>.
+The map gets populated when <code class="idl"><a data-link-type="idl" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator-2">registerAnimator(name, animatorCtor)</a></code> is called. 
+   <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope" data-dfn-type="method" data-export="" data-lt="registerAnimator(name, animatorCtor)" id="dom-animationworkletglobalscope-registeranimator">registerAnimator(<var>name</var>, <var>animatorCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:</p>
+   <ol>
+    <li data-md="">
+     <p>If the <var>name</var> is not a valid <a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a> and abort all these
+steps.</p>
+    <li data-md="">
+     <p>If the <var>name</var> exists as a key in the <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map-1">animator name to animator definition map</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw">throw</a> a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a> and abort all these steps.</p>
+    <li data-md="">
+     <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-isconstructor">IsConstructor</a>(<var>animatorCtor</var>) is false, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a> and abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>prototype</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p">Get</a>(<var>animatorCtor</var>, "prototype").</p>
+    <li data-md="">
+     <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-ecmascript-data-types-and-values">Type</a>(<var>prototype</var>) is not Object, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a> and abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>animate</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p">Get</a>(<var>prototype</var>, "animate").</p>
+    <li data-md="">
+     <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-iscallable">IsCallable</a>(<var>animate</var>) is false, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a> and
+abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>inputProperties</var> be the result of <a data-link-type="dfn" href="#parsing-a-property-list" id="ref-for-parsing-a-property-list-1">parsing a property list</a> with name
+"inputProperties" for <var>animatorCtor</var>. If an exception is thrown, rethrow the exception and
+abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>outputProperties</var> be the result of <a data-link-type="dfn" href="#parsing-a-property-list" id="ref-for-parsing-a-property-list-2">parsing a property list</a> with name
+"outputProperties" for <var>animatorCtor</var>. If an exception is thrown, rethrow the exception and
+abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>rootInputProperties</var> be the result of <a data-link-type="dfn" href="#parsing-a-property-list" id="ref-for-parsing-a-property-list-3">parsing a property list</a> with name
+"rootInputProperties" for <var>animatorCtor</var>. If an exception is thrown, rethrow the exception
+and abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>rootOutputProperties</var> be the result of <a data-link-type="dfn" href="#parsing-a-property-list" id="ref-for-parsing-a-property-list-4">parsing a property list</a> with name
+"rootOutputProperties" for <var>animatorCtor</var>. If an exception is thrown, rethrow the exception
+and abort all these steps.</p>
+    <li data-md="">
+     <p>Let <var>definition</var> be a new <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-2">animator definition</a> with:</p>
+     <ul>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-1">animator name</a> being <var>name</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#class-constructor" id="ref-for-class-constructor-1">class constructor</a> being <var>animatorCtor</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-1">animate function</a> being <var>animate</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animator-input-property-list" id="ref-for-animator-input-property-list-1">animator input property list</a> being <var>inputProperties</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animator-input-property-list" id="ref-for-animator-input-property-list-2">animator input property list</a> being <var>outputProperties</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animator-root-input-property-list" id="ref-for-animator-root-input-property-list-1">animator root input property list</a> being <var>rootInputProperties</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animator-root-output-property-list" id="ref-for-animator-root-output-property-list-1">animator root output property list</a> being <var>rootOutputProperties</var></p>
+     </ul>
+    <li data-md="">
+     <p>Add the key-value pair (<var>name</var> - <var>definition</var>) to the <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map-2">animator name to animator
+definition map</a> of the associated <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document">document</a>.</p>
+   </ol>
+   <p class="issue" id="issue-6dac41c1"><a class="self-link" href="#issue-6dac41c1"></a> Todo: Describe how we can read scroll offsets. The previous approach was to list
+it as an input / output property of proxies but the new idea is to have a readonly ScrollTimeline.</p>
+   <p>The <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-3">AnimationWorkletGlobalScope</a></code> has a <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-name-to-instance-map">animator name to instance map</dfn>. The map is
+populated when the user agent constructs a new <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-3">animator instance</a>.</p>
+   <p>When <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="parsing-a-property-list">parsing a property list</dfn> with name <em>name</em> for <code class="idl"><a data-link-type="idl" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor" id="ref-for-dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor-1">animatorCtor</a></code>,
+the user agent <em>must</em> run the following steps:</p>
+   <ol>
+    <li data-md="">
+     <p>Let <var>properties</var> be an empty <code>sequence&lt;DOMString></code></p>
+    <li data-md="">
+     <p>Let <var>propertiesIterable</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p">Get</a>(<var>animatorCtor</var>, <var>name</var>).</p>
+    <li data-md="">
+     <p>If <var>propertiesIterable</var> is not undefined, then set <var>properties</var> to the result of
+converting <var>propertiesIterable</var> to a <code>sequence&lt;DOMString></code>. If an
+exception is thrown, rethrow the exception and abort all these steps.</p>
+   </ol>
+   <h2 class="heading settled" data-level="5" id="creating-animator"><span class="secno">5. </span><span class="content">Creating an Animator</span><a class="self-link" href="#creating-animator"></a></h2>
+    Each <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-4">animator instance</a> lives in an <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-4">AnimationWorkletGlobalScope</a></code>. The <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-5">animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
+as it may contain the scripted animation state. 
+   <p>The <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-5">AnimationWorkletGlobalScope</a></code> has an <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-instance-list">animator instance list</dfn>. Anytime a new <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-6">animator instance</a> is constructed in that scope, it gets  added to the list.</p>
+   <p>To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-new-animator-instance">create a new animator instance<a class="self-link" href="#create-a-new-animator-instance"></a></dfn> given a <var>root element</var>, <var>name</var>, and <var>workletGlobalScope</var>,
+the user agent <em>must</em> run the following steps:</p>
+   <ol>
+    <li data-md="">
+     <p>If an <var>animatorInstance</var> with the same <var>name</var> and <var>root element</var> exists within the <a data-link-type="dfn" href="#animator-instance-list" id="ref-for-animator-instance-list-1">animator
+  instance list</a> then abort the following steps.</p>
+    <li data-md="">
+     <p>Let the <var>definition</var> be the result of looking up <var>name</var> on the <var>workletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map-3">animator name to animator definition map</a>.</p>
+     <p>If <var>definition</var> does not exist abort the following steps.</p>
+    <li data-md="">
+     <p>Let <var>animatorCtor</var> be the <a data-link-type="dfn" href="#class-constructor" id="ref-for-class-constructor-2">class constructor</a> of <var>definition</var>.</p>
+    <li data-md="">
+     <p>Let <var>animatorInstance</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-construct">Construct</a>(<var>animatorCtor</var>).</p>
+     <p class="issue" id="issue-4f1bf4f7"><a class="self-link" href="#issue-4f1bf4f7"></a> handle invalid construction.</p>
+    <li data-md="">
+     <p>Set the following on <var>animatorInstance</var> with:</p>
+     <ul>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-2">animator name</a> being <var>name</var></p>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-2">animation requested flag</a> being <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-1">frame-current</a></p>
+     </ul>
+    <li data-md="">
+     <p>Add <var>animatorInstance</var> to <a data-link-type="dfn" href="#animator-instance-list" id="ref-for-animator-instance-list-2">animator instance list</a>.</p>
+   </ol>
+   <h2 class="heading settled" data-level="6" id="creating-element-proxy"><span class="secno">6. </span><span class="content">Creating an Element Proxy</span><a class="self-link" href="#creating-element-proxy"></a></h2>
+    <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-1">Element Proxy</a> objects are created by the user agent for elements which have either <a class="property" data-link-type="propdesc" href="#propdef-animator" id="ref-for-propdef-animator-1">animator</a> or <a class="property" data-link-type="propdesc" href="#propdef-animator-root" id="ref-for-propdef-animator-root-1">animator-root</a> CSS properties. They cannot be constructed from user script. A single element may
+have multiple <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-2">Element Proxy</a> objects associated with it; one per <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-7">animator instance</a>. 
+   <p>The <code class="idl"><a data-link-type="idl" href="#elementproxy" id="ref-for-elementproxy-1">ElementProxy</a></code> interface exposes two maps: a read only map of proxied input properties to their
+values, and a map of proxied output properties to their values. The input and output properties in
+the maps are those specified in registerAnimator for the given <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-8">animator instance</a>.</p>
+<pre class="idl highlight def">[
+    <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">AnimationWorklet</span>),
+] <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="elementproxy">ElementProxy</dfn> {
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <dfn class="nv idl-code" data-dfn-for="ElementProxy" data-dfn-type="attribute" data-export="" data-type="StylePropertyMapReadOnly" id="dom-elementproxy-inputstylemap">inputStyleMap<a class="self-link" href="#dom-elementproxy-inputstylemap"></a></dfn>;
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="ElementProxy" data-dfn-type="attribute" data-export="" data-type="StylePropertyMapReadOnly" id="dom-elementproxy-outputstylemap">outputStyleMap</dfn>;
+};
+</pre>
+   <p class="issue" id="issue-65c145a8"><a class="self-link" href="#issue-65c145a8"></a> Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
+cannot be constructed via javascript?</p>
+   <p>When user agent wants to <dfn data-dfn-type="dfn" data-noexport="" id="create-an-element-proxy">create an element proxy<a class="self-link" href="#create-an-element-proxy"></a></dfn> given <var>element</var>, it <em>must</em> run the following steps:</p>
+   <ol>
+    <li data-md="">
+     <p>Let <var>animatorInstance</var> be the <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-9">animator instance</a> associated with <var>element</var></p>
+    <li data-md="">
+     <p>Let <var>workletGlobalScope</var> be the scope associated with <var>animatorInstance</var>.</p>
+    <li data-md="">
+     <p>Let <var>definition</var> be the result of looking up <var>name</var> on the <var>workletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map-4">animator name to animator definition map</a>.</p>
+    <li data-md="">
+     <p>Let <var>inputProperties</var> be <a data-link-type="dfn" href="#animator-input-property-list" id="ref-for-animator-input-property-list-3">animator input property list</a> of <var>definition</var>.</p>
+    <li data-md="">
+     <p>Let <var>proxy</var> be a new <code class="idl"><a data-link-type="idl" href="#elementproxy" id="ref-for-elementproxy-2">ElementProxy</a></code> Object with:</p>
+     <ul>
+      <li data-md="">
+       <p><a data-link-type="dfn" href="#proxied-element" id="ref-for-proxied-element-1">proxied element</a> being <var>element</var>.</p>
+      <li data-md="">
+       <p><code class="idl"><a data-link-type="idl" href="#dom-elementproxy-outputstylemap" id="ref-for-dom-elementproxy-outputstylemap-1">outputStyleMap</a></code> being a new <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymap">StylePropertyMap</a></code>.</p>
+     </ul>
+    <li data-md="">
+     <p><a data-link-type="dfn" href="#update-proxy-input-style-map" id="ref-for-update-proxy-input-style-map-1">update proxy input style map</a> with <var>proxy</var> and <var>inputProperties</var>.</p>
+    <li data-md="">
+     <p>Associate <var>proxy</var> with <var>animatorInstance</var>.</p>
+    <li data-md="">
+     <p>Return proxy.</p>
+   </ol>
+   <p class="note" role="note"><span>Note:</span> Writing to the outputStyle map will update the effective value of the used style value of the <a data-link-type="dfn" href="#proxied-element" id="ref-for-proxied-element-2">proxied element</a>. This <em>may</em> happen asynchronously.</p>
+   <p>When the user agent wants to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="update-proxy-input-style-map">update proxy input style map</dfn> given <var>proxy</var>, and <var>properties</var>, it <em>must</em> run the following steps:</p>
+   <ol>
+    <li data-md="">
+     <p>Let <var>styleMap</var> be a new <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a></code> populated with <em>only</em> the <a data-link-type="dfn" href="https://drafts.csswg.org/css-cascade-4/#computed-value">computed value</a> of <a data-link-type="dfn" href="#proxied-element" id="ref-for-proxied-element-3">proxied element</a> for properties listed in <var>properties</var>.</p>
+    <li data-md="">
+     <p>Set <var>proxy</var>’s inputStyleMap to <var>styleMap</var>.</p>
+   </ol>
+   <p>When an element is removed, all proxies of that element are considered to be disconnected.
+A disconnected proxy continues to have the last value from the <a data-link-type="dfn" href="https://drafts.csswg.org/css-cascade-4/#computed-value">computed value</a> of the <a data-link-type="dfn" href="#proxied-element" id="ref-for-proxied-element-4">proxied element</a> properties, but setting values on its ouputStyleMap will have no
+effect.</p>
+   <h2 class="heading settled" data-level="7" id="requesting-animation-frames"><span class="secno">7. </span><span class="content">Requesting Animation Frames</span><a class="self-link" href="#requesting-animation-frames"></a></h2>
+    Each <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-10">animator instance</a> has an associated <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-requested-flag">animation requested flag</dfn>. It must be
+either <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-requested">frame-requested</dfn>, <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-current">frame-current</dfn>. It is initially set to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-2">frame-current</a>. 
+   <p>When a new element proxy is assigned to or removed from an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-11">animator instance</a>, that <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-12">animator instance</a>’s<a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-3">animation requested flag</a> should be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-1">frame-requested</a>.</p>
+   <p>When the computed style for an element changes, the user agent <em>must</em> run the following steps:</p>
+   <p>For each <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-3">element proxy</a> for that element, perform the following steps:</p>
+   <ol>
+    <li data-md="">
+     <p>Let <var>proxy</var> be the current <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-4">element proxy</a> of the element.</p>
+    <li data-md="">
+     <p>Let <var>animator</var> be the <var>proxy</var>’s assigned animator.</p>
+    <li data-md="">
+     <p>Let <var>name</var> be the <var>animator</var>’s name.</p>
+    <li data-md="">
+     <p>Let <var>definition</var> be the result of looking up <var>name</var> on the <var>workletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map-5">animator name to animator definition map</a>.</p>
+    <li data-md="">
+     <p>Let <var>inputProperties</var> be <a data-link-type="dfn" href="#animator-input-property-list" id="ref-for-animator-input-property-list-4">animator input property list</a> of <var>definition</var>.</p>
+    <li data-md="">
+     <p>For each property in <var>inputProperties</var>, if the property’s computed value has changed,
+set the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-4">animation requested flag</a> on the <var>animator</var> to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-2">frame-requested</a>.</p>
+   </ol>
+   <p><a href="#running-animators">§8 Running Animators</a> sets <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-5">animation requested flag</a> on animators to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-3">frame-current</a>.</p>
+   <p class="issue" id="issue-5edadb19"><a class="self-link" href="#issue-5edadb19"></a> Todo: Animators that have Timeline as an explicit input will need to request frame
+on every animation frame. Formulate this here.</p>
+   <h2 class="heading settled" data-level="8" id="running-animators"><span class="secno">8. </span><span class="content">Running Animators</span><a class="self-link" href="#running-animators"></a></h2>
+   <p>When a user agent wants to produce a new animation frame, if for any <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-13">animator instance</a> the
+associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-6">animation requested flag</a> is <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-3">frame-requested</a> then the the user agent <em>must</em> <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-1">run animators</a> for the current frame.</p>
+   <p class="note" role="note"><span>Note:</span> The user agent is not required to run animations on every frame. It is legal to defer
+      generating an animation frame until a later frame. This allow the user agent to
+      provide a different service level according to their policy.</p>
+   <p>When the user agent wants to <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="run-animators">run animators</dfn>, it <em>must</em> iterates over <a data-link-type="dfn" href="#animator-instance-list" id="ref-for-animator-instance-list-3">animator
+instance list</a> as <var>instance</var>:</p>
+   <ol>
+    <li data-md="">
+     <p>If the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-7">animation requested flag</a> for the instance is <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-4">frame-current</a> or the proxies belonging to the <var>instance</var> will not be visible within the visual viewport
+    of the current frame the user agent <em>may</em> abort all the following steps.</p>
+     <p class="issue" id="issue-dc52329c"><a class="self-link" href="#issue-dc52329c"></a> Consider giving user agents permission to skip running animator instances to throttle
+    slow animators.</p>
+    <li data-md="">
+     <p>Let <var>name</var> be the <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-3">animator name</a> of <var>instance</var>.</p>
+    <li data-md="">
+     <p>Let <var>workletGlobalScope</var> be a <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-6">AnimationWorkletGlobalScope</a></code> from the list of <a data-link-type="dfn" href="https://drafts.css-houdini.org/worklets/#worklets-workletglobalscopes">worklet’s
+    WorkletGlobalScopes</a> from the animation <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a></code>.</p>
+    <li data-md="">
+     <p>Let the <var>definition</var> be the result of looking up <var>name</var> on the <var>workletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map-6">animator name to animator definition map</a>.</p>
+     <p>If <var>definition</var> does not exist abort the following steps.</p>
+    <li data-md="">
+     <p>Let <var>animatorInstance</var> be the result of looking up <var>name</var> on <var>workletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-instance-map" id="ref-for-animator-name-to-instance-map-1">animator name to instance map</a>. If <var>animatorInstance</var> is null run the following
+    substeps:</p>
+     <p class="issue" id="issue-eb5eb289"><a class="self-link" href="#issue-eb5eb289"></a> Todo: Add steps to create new animatorInstance given the animator definition.</p>
+    <li data-md="">
+     <p>Let <var>animateFunction</var> be <var>definition</var>’s <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-2">animate function</a>.</p>
+    <li data-md="">
+     <p>Let <var>timestamp</var> be a <a data-link-type="dfn" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp">DOMHighResTimeStamp</a> indicating the current frame start time.</p>
+    <li data-md="">
+     <p>Let <var>timeline</var> be a new <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/web-animations/#animationtimeline">AnimationTimeline</a></code> with its "currentTime" set to <var>timestamp</var>.</p>
+    <li data-md="">
+     <p>Let <var>root</var> be a <a data-link-type="dfn" href="#root-element-proxy" id="ref-for-root-element-proxy-1">root element proxy</a> of <var>instance</var>.</p>
+    <li data-md="">
+     <p>Let <var>children</var> be a <a data-link-type="dfn" href="#children-element-proxies" id="ref-for-children-element-proxies-1">children element proxies</a> of <var>instance</var>.</p>
+    <li data-md="">
+     <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#es-invoking-callback-functions">Invoke</a> <var>animateFunction</var> with arguments «<var>root</var>, <var>children</var>, <var>timeline</var>»,
+    and with <var>animatorInstance</var> as the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-this-value">callback this value</a>.</p>
+   </ol>
+   <p class="note" role="note"><span>Note:</span> Although inefficient, it is legal for the user agent to <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-2">run animators</a> multiple times
+in the same frame.</p>
+   <h2 class="heading settled" data-level="9" id="closing-animator"><span class="secno">9. </span><span class="content">Closing an Animator</span><a class="self-link" href="#closing-animator"></a></h2>
+   <p class="issue" id="issue-d4d8f39c"><a class="self-link" href="#issue-d4d8f39c"></a> Todo: Define when we may get rid of the animator.</p>
+   <h2 class="heading settled" data-level="10" id="css-animator-notation"><span class="secno">10. </span><span class="content">CSS Animator Notation</span><a class="self-link" href="#css-animator-notation"></a></h2>
+   <p>Two CSS properties <a class="property" data-link-type="propdesc" href="#propdef-animator-root" id="ref-for-propdef-animator-root-2">animator-root</a> and <a class="property" data-link-type="propdesc" href="#propdef-animator" id="ref-for-propdef-animator-2">animator</a> may be used to
+assign an HTML elements to an animator instance either as a root element or a child element.</p>
+   <table class="def propdef" data-link-for-hint="animator-root">
+    <tbody>
+     <tr>
+      <th>Name:
+      <td><dfn class="dfn-paneled css" data-dfn-type="property" data-export="" id="propdef-animator-root">animator-root</dfn>
+     <tr class="value">
+      <th>Value:
+      <td class="prod">[ none <a data-link-type="grammar" href="https://drafts.csswg.org/css-values-4/#comb-one">|</a> <a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a> ]<a data-link-type="grammar" href="https://drafts.csswg.org/css-values-4/#mult-comma">#</a>
+     <tr>
+      <th>Initial:
+      <td>none
+     <tr>
+      <th>Applies to:
+      <td><a href="https://drafts.csswg.org/css-pseudo/#generated-content" title="Includes ::before and ::after pseudo-elements.">all elements</a>
+     <tr>
+      <th>Inherited:
+      <td>no
+     <tr>
+      <th>Percentages:
+      <td>N/A
+     <tr>
+      <th>Media:
+      <td>interactive
+     <tr>
+      <th>Computed value:
+      <td>as specified
+     <tr>
+      <th>Canonical order:
+      <td>per grammar
+     <tr>
+      <th>Animatable:
+      <td>no
+   </table>
+   <dl>
+    <dt><dfn class="css" data-dfn-for="animator-root" data-dfn-type="value" data-export="" id="valdef-animator-root-none">none<a class="self-link" href="#valdef-animator-root-none"></a></dfn> 
+    <dd> There will be no animators. 
+    <dt><dfn class="css" data-dfn-for="animator-root" data-dfn-type="value" data-export="" id="valdef-animator-root-ident"><a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a><a class="self-link" href="#valdef-animator-root-ident"></a></dfn> 
+    <dd> If there is a <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-3">animator definition</a> registered with that name, then a new <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-14">animator instance</a> will be created with this element as its <a data-link-type="dfn" href="#root-element-proxy" id="ref-for-root-element-proxy-2">root element proxy</a>.
+       The new <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-15">animator instance</a> lifetime is tied to this root element’s lifetime. If no <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-4">animator
+       definition</a> exists with that name, then the instance will be created as soon as one is
+       registered. 
+   </dl>
+   <table class="def propdef" data-link-for-hint="animator">
+    <tbody>
+     <tr>
+      <th>Name:
+      <td><dfn class="dfn-paneled css" data-dfn-type="property" data-export="" id="propdef-animator">animator</dfn>
+     <tr class="value">
+      <th>Value:
+      <td class="prod">[ none <a data-link-type="grammar" href="https://drafts.csswg.org/css-values-4/#comb-one">|</a> <a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a> ]<a data-link-type="grammar" href="https://drafts.csswg.org/css-values-4/#mult-comma">#</a>
+     <tr>
+      <th>Initial:
+      <td>auto
+     <tr>
+      <th>Applies to:
+      <td><a href="https://drafts.csswg.org/css-pseudo/#generated-content" title="Includes ::before and ::after pseudo-elements.">all elements</a>
+     <tr>
+      <th>Inherited:
+      <td>no
+     <tr>
+      <th>Percentages:
+      <td>N/A
+     <tr>
+      <th>Media:
+      <td>interactive
+     <tr>
+      <th>Computed value:
+      <td>as specified
+     <tr>
+      <th>Canonical order:
+      <td>per grammar
+     <tr>
+      <th>Animatable:
+      <td>no
+   </table>
+   <dl>
+    <dt><dfn class="css" data-dfn-for="animator" data-dfn-type="value" data-export="" id="valdef-animator-none">none<a class="self-link" href="#valdef-animator-none"></a></dfn> 
+    <dd> There will be no animators. 
+    <dt><dfn class="css" data-dfn-for="animator" data-dfn-type="value" data-export="" id="valdef-animator-ident"><a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a><a class="self-link" href="#valdef-animator-ident"></a></dfn> 
+    <dd>
+      If there is a <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-5">animator definition</a> registered with that name, then this element is
+      assigned to the first ancestor animator instance of the given name as a child element proxy.
+      If no <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-6">animator definition</a> exists with that name, then the element gets assigned as soon
+      as one is registered. 
+     <p class="issue" id="issue-1b17109a"><a class="self-link" href="#issue-1b17109a"></a> Todo: If no ancestor animator instance exists with that name then we should create one
+      with document root element as its root.</p>
+   </dl>
+   <p class="note" role="note"><span>Note:</span> All the elements in the root element’s DOM sub-tree that get associated with the same animator
+ name will get assigned to the the animator instance linked with this root element.</p>
+   <p class="issue" id="issue-fa18aa46"><a class="self-link" href="#issue-fa18aa46"></a> Todo: Write the algorithm for element assignments. It will include construction of a new <code class="idl"><a data-link-type="idl" href="#elementproxy" id="ref-for-elementproxy-3">ElementProxy</a></code>, looking up or creating animator instance, and assigning the animator. We probably
+need a diagram here too.</p>
+   <h2 class="heading settled" data-level="11" id="effect-stack"><span class="secno">11. </span><span class="content">Effect Stack</span><a class="self-link" href="#effect-stack"></a></h2>
+   <p class="issue" id="issue-b3b90f2d"><a class="self-link" href="#issue-b3b90f2d"></a> Todo: the animators output style values have the highest order in animation stack effect and
+their composite operation is "replace" which is going to allow them to run independent on other
+animations and in a different thread. Supporting other composite operation is not in scope at this
+point.</p>
+   <h2 class="heading settled" data-level="12" id="security-considerations"><span class="secno">12. </span><span class="content">Security Considerations</span><a class="self-link" href="#security-considerations"></a></h2>
+   <p class="issue" id="issue-de770110"><a class="self-link" href="#issue-de770110"></a> Need to decide what security considerations there are for this spec.</p>
+   <h2 class="heading settled" data-level="13" id="privacy-considerations"><span class="secno">13. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy-considerations"></a></h2>
+   <p class="issue" id="issue-19f9ed9b"><a class="self-link" href="#issue-19f9ed9b"></a> Need to decide what privacy considerations there are for this spec.</p>
+   <h2 class="heading settled" data-level="14" id="examples"><span class="secno">14. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
+   <h3 class="heading settled" data-level="14.1" id="example-1"><span class="secno">14.1. </span><span class="content">Example 1: A fade-in animation with spring timing.</span><a class="self-link" href="#example-1"></a></h3>
+<pre class="lang-markup highlight">.myFadein {
+  animator:'spring-fadein';
+}
+
+<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
+<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span> <span class="na">style</span><span class="o">=</span><span class="s">"--spring-k: 25;"</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="na">lt</span>;
+<span class="na">document</span>.<span class="na">animationWorklet</span>.<span class="na">import</span>('<span class="na">spring-timing</span>.<span class="na">js</span>');
+&lt;/<span class="na">scriptlt</span>;
+</pre>
+<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope
+</span>registerAnimator<span class="p">(</span><span class="s1">'spring-fadein'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
+
+    <span class="kr">static</span> inputProperties <span class="o">=</span>  <span class="p">[</span><span class="s1">'--spring-k'</span><span class="p">]</span><span class="p">;</span>
+    <span class="kr">static</span> outputProperties <span class="o">=</span>  <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]</span><span class="p">;</span>
+    <span class="kr">static</span> inputTime <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+    animate<span class="p">(</span>root<span class="p">,</span> children<span class="p">,</span> timeline<span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">=</span> <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">||</span> timeline<span class="p">.</span>currentTime<span class="p">;</span>
+        <span class="kr">const</span> deltaT <span class="o">=</span> timeline<span class="p">.</span>currentTime <span class="o">-</span> <span class="k">this</span><span class="p">.</span>startTime_<span class="p">;</span>
+        children<span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+          <span class="c1">// read a custom css property.
+</span>          <span class="kr">const</span> k <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--spring-k'</span><span class="p">)</span> <span class="o">||</span> <span class="mi">1</span><span class="p">;</span>
+          <span class="c1">// compute progress using a fancy spring timing function.
+</span>          <span class="kr">const</span> effectiveValue <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> springTiming<span class="p">(</span>deltaT<span class="p">,</span> k<span class="p">)</span><span class="p">;</span>
+          <span class="c1">// update opacity accordingly.
+</span>          elem<span class="p">.</span>ouputStyleMap<span class="p">.</span>opacity <span class="o">=</span> effectiveValue<span class="p">;</span>
+        <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    springTiming<span class="p">(</span>deltaT<span class="p">,</span> k<span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// simulate the spring effect and return a progress value between [-1, 1];
+</span>    <span class="p">}</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
+  </main>
+  <h2 class="no-ref no-num heading settled" id="conformance"><span class="content"> Conformance</span><a class="self-link" href="#conformance"></a></h2>
+  <h3 class="no-ref heading settled" id="conventions"><span class="content"> Document conventions</span><a class="self-link" href="#conventions"></a></h3>
+  <p>Conformance requirements are expressed with a combination of
+    descriptive assertions and RFC 2119 terminology. The key words “MUST”,
+    “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”,
+    “RECOMMENDED”, “MAY”, and “OPTIONAL” in the normative parts of this
+    document are to be interpreted as described in RFC 2119.
+    However, for readability, these words do not appear in all uppercase
+    letters in this specification. </p>
+  <p>All of the text of this specification is normative except sections
+    explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a></p>
+  <p>Examples in this specification are introduced with the words “for example”
+    or are set apart from the normative text with <code>class="example"</code>,
+    like this: </p>
+  <div class="example" id="example-f839f6c8">
+   <a class="self-link" href="#example-f839f6c8"></a> 
+   <p>This is an example of an informative example.</p>
+  </div>
+  <p>Informative notes begin with the word “Note” and are set apart from the
+    normative text with <code>class="note"</code>, like this: </p>
+  <p class="note" role="note">Note, this is an informative note.</p>
+  <p>Advisements are normative sections styled to evoke special attention and are
+    set apart from other normative text with <code>&lt;strong class="advisement"></code>, like
+    this: <strong class="advisement"> UAs MUST provide an accessible alternative. </strong> </p>
+  <h3 class="no-ref heading settled" id="conformance-classes"><span class="content"> Conformance classes</span><a class="self-link" href="#conformance-classes"></a></h3>
+  <p>Conformance to this specification
+    is defined for three conformance classes: </p>
+  <dl>
+   <dt>style sheet 
+   <dd>A <a href="http://www.w3.org/TR/CSS21/conform.html#style-sheet">CSS
+            style sheet</a>. 
+   <dt>renderer 
+   <dd>A <a href="http://www.w3.org/TR/CSS21/conform.html#user-agent">UA</a> that interprets the semantics of a style sheet and renders
+            documents that use them. 
+   <dt>authoring tool 
+   <dd>A <a href="http://www.w3.org/TR/CSS21/conform.html#user-agent">UA</a> that writes a style sheet. 
+  </dl>
+  <p>A style sheet is conformant to this specification
+    if all of its statements that use syntax defined in this module are valid
+    according to the generic CSS grammar and the individual grammars of each
+    feature defined in this module. </p>
+  <p>A renderer is conformant to this specification
+    if, in addition to interpreting the style sheet as defined by the
+    appropriate specifications, it supports all the features defined
+    by this specification by parsing them correctly
+    and rendering the document accordingly. However, the inability of a
+    UA to correctly render a document due to limitations of the device
+    does not make the UA non-conformant. (For example, a UA is not
+    required to render color on a monochrome monitor.) </p>
+  <p>An authoring tool is conformant to this specification
+    if it writes style sheets that are syntactically correct according to the
+    generic CSS grammar and the individual grammars of each feature in
+    this module, and meet all other conformance requirements of style sheets
+    as described in this module. </p>
+  <h3 class="no-ref heading settled" id="partial"><span class="content"> Partial implementations</span><a class="self-link" href="#partial"></a></h3>
+  <p>So that authors can exploit the forward-compatible parsing rules to
+    assign fallback values, CSS renderers <strong>must</strong> treat as invalid (and <a href="http://www.w3.org/TR/CSS21/conform.html#ignore">ignore
+    as appropriate</a>) any at-rules, properties, property values, keywords,
+    and other syntactic constructs for which they have no usable level of
+    support. In particular, user agents <strong>must not</strong> selectively
+    ignore unsupported component values and honor supported values in a single
+    multi-value property declaration: if any value is considered invalid
+    (as unsupported values must be), CSS requires that the entire declaration
+    be ignored.</p>
+  <h4 class="heading settled" id="conform-future-proofing"><span class="content"> Implementations of Unstable and Proprietary Features</span><a class="self-link" href="#conform-future-proofing"></a></h4>
+  <p>To avoid clashes with future stable CSS features,
+        the CSSWG recommends <a href="http://www.w3.org/TR/CSS/#future-proofing">following best practices</a> for the implementation of <a href="http://www.w3.org/TR/CSS/#unstable">unstable</a> features and <a href="http://www.w3.org/TR/CSS/#proprietary-extension">proprietary extensions</a> to CSS. </p>
+  <h3 class="no-ref heading settled" id="testing"><span class="content"> Non-experimental implementations</span><a class="self-link" href="#testing"></a></h3>
+  <p>Once a specification reaches the Candidate Recommendation stage,
+    non-experimental implementations are possible, and implementors should
+    release an unprefixed implementation of any CR-level feature they
+    can demonstrate to be correctly implemented according to spec. </p>
+  <p>To establish and maintain the interoperability of CSS across
+    implementations, the CSS Working Group requests that non-experimental
+    CSS renderers submit an implementation report (and, if necessary, the
+    testcases used for that implementation report) to the W3C before
+    releasing an unprefixed implementation of any CSS features. Testcases
+    submitted to W3C are subject to review and correction by the CSS
+    Working Group. </p>
+  <p>
+   Further information on submitting testcases and implementation reports
+    can be found from on the CSS Working Group’s website at <a href="http://www.w3.org/Style/CSS/Test/">http://www.w3.org/Style/CSS/Test/</a>.
+    Questions should be directed to the <a href="http://lists.w3.org/Archives/Public/public-css-testsuite">public-css-testsuite@w3.org</a> mailing list. 
+<script src="https://www.w3.org/scripts/TR/2016/fixup.js"></script>
+  </p>
+  <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
+  <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
+  <ul class="index">
+   <li><a href="#animate-function">animate function</a><span>, in §3</span>
+   <li><a href="#animation-requested-flag">animation requested flag</a><span>, in §7</span>
+   <li><a href="#animation-worklet">Animation Worklet</a><span>, in §2</span>
+   <li><a href="#dom-window-animationworklet">animationWorklet</a><span>, in §2</span>
+   <li><a href="#animationworklet">AnimationWorklet</a><span>, in §2</span>
+   <li><a href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a><span>, in §2</span>
+   <li><a href="#propdef-animator">animator</a><span>, in §10</span>
+   <li><a href="#animator-definition">animator definition</a><span>, in §3</span>
+   <li><a href="#animator-input-property-list">animator input property list</a><span>, in §3</span>
+   <li><a href="#animator-instance">animator instance</a><span>, in §3</span>
+   <li><a href="#animator-instance-list">animator instance list</a><span>, in §5</span>
+   <li><a href="#animator-name">animator name</a><span>, in §3</span>
+   <li><a href="#animator-name-to-animator-definition-map">animator name to animator definition map</a><span>, in §4</span>
+   <li><a href="#animator-name-to-instance-map">animator name to instance map</a><span>, in §4</span>
+   <li><a href="#animator-output-property-list">animator output property list</a><span>, in §3</span>
+   <li><a href="#propdef-animator-root">animator-root</a><span>, in §10</span>
+   <li><a href="#animator-root-input-property-list">animator root input property list</a><span>, in §3</span>
+   <li><a href="#animator-root-output-property-list">animator root output property list</a><span>, in §3</span>
+   <li><a href="#children-element-proxies">children element proxies</a><span>, in §3</span>
+   <li><a href="#class-constructor">class constructor</a><span>, in §3</span>
+   <li><a href="#create-an-element-proxy">create an element proxy</a><span>, in §6</span>
+   <li><a href="#create-a-new-animator-instance">create a new animator instance</a><span>, in §5</span>
+   <li><a href="#elementproxy">ElementProxy</a><span>, in §6</span>
+   <li><a href="#element-proxy">element proxy</a><span>, in §3</span>
+   <li><a href="#frame-current">frame-current</a><span>, in §7</span>
+   <li><a href="#frame-requested">frame-requested</a><span>, in §7</span>
+   <li>
+    &lt;ident>
+    <ul>
+     <li><a href="#valdef-animator-root-ident">value for animator-root</a><span>, in §10</span>
+     <li><a href="#valdef-animator-ident">value for animator</a><span>, in §10</span>
+    </ul>
+   <li><a href="#dom-animationworklet-import">import(moduleURL)</a><span>, in §2</span>
+   <li><a href="#dom-elementproxy-inputstylemap">inputStyleMap</a><span>, in §6</span>
+   <li>
+    none
+    <ul>
+     <li><a href="#valdef-animator-root-none">value for animator-root</a><span>, in §10</span>
+     <li><a href="#valdef-animator-none">value for animator</a><span>, in §10</span>
+    </ul>
+   <li><a href="#dom-elementproxy-outputstylemap">outputStyleMap</a><span>, in §6</span>
+   <li><a href="#parsing-a-property-list">parsing a property list</a><span>, in §4</span>
+   <li><a href="#proxied-element">proxied element</a><span>, in §3</span>
+   <li><a href="#dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtor)</a><span>, in §4</span>
+   <li><a href="#root-element-proxy">root element proxy</a><span>, in §3</span>
+   <li><a href="#run-animators">run animators</a><span>, in §8</span>
+   <li><a href="#update-proxy-input-style-map">update proxy input style map</a><span>, in §6</span>
+   <li><a href="#callbackdef-voidfunction">VoidFunction</a><span>, in §2</span>
+  </ul>
+  <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
+  <ul class="index">
+   <li>
+    <a data-link-type="biblio">[css-cascade-4]</a> defines the following terms:
+    <ul>
+     <li><a href="https://drafts.csswg.org/css-cascade-4/#computed-value">computed value</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[css-typed-om-1]</a> defines the following terms:
+    <ul>
+     <li><a href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymap">StylePropertyMap</a>
+     <li><a href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[css-values-3]</a> defines the following terms:
+    <ul>
+     <li><a href="https://drafts.csswg.org/css-values-4/#mult-comma">#</a>
+     <li><a href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a>
+     <li><a href="https://drafts.csswg.org/css-values-4/#comb-one">|</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[DOM]</a> defines the following terms:
+    <ul>
+     <li><a href="https://dom.spec.whatwg.org/#concept-document">document</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[HTML]</a> defines the following terms:
+    <ul>
+     <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[web-animations-1]</a> defines the following terms:
+    <ul>
+     <li><a href="https://w3c.github.io/web-animations/#animationtimeline">AnimationTimeline</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[WebIDL]</a> defines the following terms:
+    <ul>
+     <li><a href="https://heycam.github.io/webidl/#idl-DOMString">DOMString</a>
+     <li><a href="https://heycam.github.io/webidl/#Exposed">Exposed</a>
+     <li><a href="https://heycam.github.io/webidl/#NewObject">NewObject</a>
+     <li><a href="https://heycam.github.io/webidl/#SameObject">SameObject</a>
+     <li><a href="https://heycam.github.io/webidl/#idl-USVString">USVString</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[worklets-1]</a> defines the following terms:
+    <ul>
+     <li><a href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a>
+     <li><a href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a>
+     <li><a href="https://drafts.css-houdini.org/worklets/#worklet-global-scope-type">worklet global scope type</a>
+     <li><a href="https://drafts.css-houdini.org/worklets/#worklets-workletglobalscopes">worklet's workletglobalscopes</a>
+    </ul>
+  </ul>
+  <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
+  <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
+  <dl>
+   <dt id="biblio-css-cascade-4">[CSS-CASCADE-4]
+   <dd>Elika Etemad; Tab Atkins Jr.. <a href="https://www.w3.org/TR/css-cascade-4/">CSS Cascading and Inheritance Level 4</a>. URL: <a href="https://www.w3.org/TR/css-cascade-4/">https://www.w3.org/TR/css-cascade-4/</a>
+   <dt id="biblio-css-typed-om-1">[CSS-TYPED-OM-1]
+   <dd>Shane Stephens. <a href="https://www.w3.org/TR/css-typed-om-1/">CSS Typed OM Level 1</a>. URL: <a href="https://www.w3.org/TR/css-typed-om-1/">https://www.w3.org/TR/css-typed-om-1/</a>
+   <dt id="biblio-css-values-3">[CSS-VALUES-3]
+   <dd>Tab Atkins Jr.; Elika Etemad. <a href="https://www.w3.org/TR/css-values-3/">CSS Values and Units Module Level 3</a>. URL: <a href="https://www.w3.org/TR/css-values-3/">https://www.w3.org/TR/css-values-3/</a>
+   <dt id="biblio-dom">[DOM]
+   <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
+   <dt id="biblio-html">[HTML]
+   <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
+   <dt id="biblio-rfc2119">[RFC2119]
+   <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+   <dt id="biblio-web-animations-1">[WEB-ANIMATIONS-1]
+   <dd>Brian Birtles; et al. <a href="https://www.w3.org/TR/web-animations-1/">Web Animations</a>. URL: <a href="https://www.w3.org/TR/web-animations-1/">https://www.w3.org/TR/web-animations-1/</a>
+   <dt id="biblio-webidl">[WebIDL]
+   <dd>Cameron McCormack; Boris Zbarsky; Tobie Langel. <a href="https://www.w3.org/TR/WebIDL-1/">Web IDL</a>. URL: <a href="https://www.w3.org/TR/WebIDL-1/">https://www.w3.org/TR/WebIDL-1/</a>
+   <dt id="biblio-worklets-1">[WORKLETS-1]
+   <dd>Ian Kilpatrick. <a href="https://www.w3.org/TR/worklets-1/">Worklets Level 1</a>. URL: <a href="https://www.w3.org/TR/worklets-1/">https://www.w3.org/TR/worklets-1/</a>
+  </dl>
+  <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
+  <dl>
+   <dt id="biblio-explainer">[EXPLAINER]
+   <dd><a href="https://github.com/WICG/animation-worklet/blob/gh-pages/README.md">Animation Worklet Explainer</a>. CR. URL: <a href="https://github.com/WICG/animation-worklet/blob/gh-pages/README.md">https://github.com/WICG/animation-worklet/blob/gh-pages/README.md</a>
+  </dl>
+  <h2 class="no-num no-ref heading settled" id="property-index"><span class="content">Property Index</span><a class="self-link" href="#property-index"></a></h2>
+  <div class="big-element-wrapper">
+   <table class="index">
+    <thead>
+     <tr>
+      <th scope="col">Name
+      <th scope="col">Value
+      <th scope="col">Initial
+      <th scope="col">Applies to
+      <th scope="col">Inh.
+      <th scope="col">%ages
+      <th scope="col">Media
+      <th scope="col">Ani­mat­able
+      <th scope="col">Canonical order
+      <th scope="col">Com­puted value
+    <tbody>
+     <tr>
+      <th scope="row"><a class="css" data-link-type="property" href="#propdef-animator-root">animator-root</a>
+      <td>[ none |  &lt;ident> ]#
+      <td>none
+      <td>all elements
+      <td>no
+      <td>N/A
+      <td>interactive
+      <td>no
+      <td>per grammar
+      <td>as specified
+     <tr>
+      <th scope="row"><a class="css" data-link-type="property" href="#propdef-animator">animator</a>
+      <td>[ none |  &lt;ident> ]#
+      <td>auto
+      <td>all elements
+      <td>no
+      <td>N/A
+      <td>interactive
+      <td>no
+      <td>per grammar
+      <td>as specified
+   </table>
+  </div>
+  <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
+<pre class="idl def"><span class="kt">interface</span> <a class="nv" href="#animationworklet">AnimationWorklet</a> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <a class="nv" href="#dom-animationworklet-import">import</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <a class="nv" href="#dom-animationworklet-import-moduleurl-moduleurl">moduleURL</a>);
+};
+
+<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a> {
+    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet">AnimationWorklet</a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet">animationWorklet</a>;
+};
+
+<span class="kt">callback</span> <a class="nv" href="#callbackdef-voidfunction">VoidFunction</a> = <span class="kt">void</span> ();
+
+[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">AnimationWorklet</span>]
+<span class="kt">interface</span> <a class="nv" href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
+    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name">name</a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction">VoidFunction</a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">animatorCtor</a>);
+};
+
+[
+    <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">AnimationWorklet</span>),
+] <span class="kt">interface</span> <a class="nv" href="#elementproxy">ElementProxy</a> {
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap">inputStyleMap</a>;
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap">outputStyleMap</a>;
+};
+
+</pre>
+  <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
+  <div style="counter-reset:issue">
+   <div class="issue"> Todo: Describe how we can read scroll offsets. The previous approach was to list
+it as an input / output property of proxies but the new idea is to have a readonly ScrollTimeline.<a href="#issue-6dac41c1"> ↵ </a></div>
+   <div class="issue"> handle invalid construction.<a href="#issue-4f1bf4f7"> ↵ </a></div>
+   <div class="issue"> Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
+cannot be constructed via javascript?<a href="#issue-65c145a8"> ↵ </a></div>
+   <div class="issue"> Todo: Animators that have Timeline as an explicit input will need to request frame
+on every animation frame. Formulate this here.<a href="#issue-5edadb19"> ↵ </a></div>
+   <div class="issue"> Consider giving user agents permission to skip running animator instances to throttle
+    slow animators.<a href="#issue-dc52329c"> ↵ </a></div>
+   <div class="issue"> Todo: Add steps to create new animatorInstance given the animator definition.<a href="#issue-eb5eb289"> ↵ </a></div>
+   <div class="issue"> Todo: Define when we may get rid of the animator.<a href="#issue-d4d8f39c"> ↵ </a></div>
+   <div class="issue"> Todo: If no ancestor animator instance exists with that name then we should create one
+      with document root element as its root.<a href="#issue-1b17109a"> ↵ </a></div>
+   <div class="issue"> Todo: Write the algorithm for element assignments. It will include construction of a new <code class="idl"><a data-link-type="idl" href="#elementproxy">ElementProxy</a></code>, looking up or creating animator instance, and assigning the animator. We probably
+need a diagram here too.<a href="#issue-fa18aa46"> ↵ </a></div>
+   <div class="issue"> Todo: the animators output style values have the highest order in animation stack effect and
+their composite operation is "replace" which is going to allow them to run independent on other
+animations and in a different thread. Supporting other composite operation is not in scope at this
+point.<a href="#issue-b3b90f2d"> ↵ </a></div>
+   <div class="issue"> Need to decide what security considerations there are for this spec.<a href="#issue-de770110"> ↵ </a></div>
+   <div class="issue"> Need to decide what privacy considerations there are for this spec.<a href="#issue-19f9ed9b"> ↵ </a></div>
+  </div>
+  <aside class="dfn-panel" data-for="animation-worklet">
+   <b><a href="#animation-worklet">#animation-worklet</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animation-worklet-1">1. Introduction</a> <a href="#ref-for-animation-worklet-2">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animationworklet">
+   <b><a href="#animationworklet">#animationworklet</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animationworklet-1">2. Animation Worklet</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-window-animationworklet">
+   <b><a href="#dom-window-animationworklet">#dom-window-animationworklet</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-window-animationworklet-1">2. Animation Worklet</a> <a href="#ref-for-dom-window-animationworklet-2">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="callbackdef-voidfunction">
+   <b><a href="#callbackdef-voidfunction">#callbackdef-voidfunction</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-callbackdef-voidfunction-1">2. Animation Worklet</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animationworkletglobalscope">
+   <b><a href="#animationworkletglobalscope">#animationworkletglobalscope</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animationworkletglobalscope-1">2. Animation Worklet</a>
+    <li><a href="#ref-for-animationworkletglobalscope-2">4. Registering an Animator Definition</a> <a href="#ref-for-animationworkletglobalscope-3">(2)</a>
+    <li><a href="#ref-for-animationworkletglobalscope-4">5. Creating an Animator</a> <a href="#ref-for-animationworkletglobalscope-5">(2)</a>
+    <li><a href="#ref-for-animationworkletglobalscope-6">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">
+   <b><a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor-1">4. Registering an Animator Definition</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-definition">
+   <b><a href="#animator-definition">#animator-definition</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-definition-1">3. Concepts</a>
+    <li><a href="#ref-for-animator-definition-2">4. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animator-definition-3">10. CSS Animator Notation</a> <a href="#ref-for-animator-definition-4">(2)</a> <a href="#ref-for-animator-definition-5">(3)</a> <a href="#ref-for-animator-definition-6">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="class-constructor">
+   <b><a href="#class-constructor">#class-constructor</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-class-constructor-1">4. Registering an Animator Definition</a>
+    <li><a href="#ref-for-class-constructor-2">5. Creating an Animator</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animate-function">
+   <b><a href="#animate-function">#animate-function</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animate-function-1">4. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animate-function-2">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-input-property-list">
+   <b><a href="#animator-input-property-list">#animator-input-property-list</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-input-property-list-1">4. Registering an Animator Definition</a> <a href="#ref-for-animator-input-property-list-2">(2)</a>
+    <li><a href="#ref-for-animator-input-property-list-3">6. Creating an Element Proxy</a>
+    <li><a href="#ref-for-animator-input-property-list-4">7. Requesting Animation Frames</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-root-input-property-list">
+   <b><a href="#animator-root-input-property-list">#animator-root-input-property-list</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-root-input-property-list-1">4. Registering an Animator Definition</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-root-output-property-list">
+   <b><a href="#animator-root-output-property-list">#animator-root-output-property-list</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-root-output-property-list-1">4. Registering an Animator Definition</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-instance">
+   <b><a href="#animator-instance">#animator-instance</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-instance-1">3. Concepts</a> <a href="#ref-for-animator-instance-2">(2)</a>
+    <li><a href="#ref-for-animator-instance-3">4. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animator-instance-4">5. Creating an Animator</a> <a href="#ref-for-animator-instance-5">(2)</a> <a href="#ref-for-animator-instance-6">(3)</a>
+    <li><a href="#ref-for-animator-instance-7">6. Creating an Element Proxy</a> <a href="#ref-for-animator-instance-8">(2)</a> <a href="#ref-for-animator-instance-9">(3)</a>
+    <li><a href="#ref-for-animator-instance-10">7. Requesting Animation Frames</a> <a href="#ref-for-animator-instance-11">(2)</a> <a href="#ref-for-animator-instance-12">(3)</a>
+    <li><a href="#ref-for-animator-instance-13">8. Running Animators</a>
+    <li><a href="#ref-for-animator-instance-14">10. CSS Animator Notation</a> <a href="#ref-for-animator-instance-15">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-name">
+   <b><a href="#animator-name">#animator-name</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-name-1">4. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animator-name-2">5. Creating an Animator</a>
+    <li><a href="#ref-for-animator-name-3">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="root-element-proxy">
+   <b><a href="#root-element-proxy">#root-element-proxy</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-root-element-proxy-1">8. Running Animators</a>
+    <li><a href="#ref-for-root-element-proxy-2">10. CSS Animator Notation</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="children-element-proxies">
+   <b><a href="#children-element-proxies">#children-element-proxies</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-children-element-proxies-1">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="element-proxy">
+   <b><a href="#element-proxy">#element-proxy</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-element-proxy-1">6. Creating an Element Proxy</a> <a href="#ref-for-element-proxy-2">(2)</a>
+    <li><a href="#ref-for-element-proxy-3">7. Requesting Animation Frames</a> <a href="#ref-for-element-proxy-4">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="proxied-element">
+   <b><a href="#proxied-element">#proxied-element</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-proxied-element-1">6. Creating an Element Proxy</a> <a href="#ref-for-proxied-element-2">(2)</a> <a href="#ref-for-proxied-element-3">(3)</a> <a href="#ref-for-proxied-element-4">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-name-to-animator-definition-map">
+   <b><a href="#animator-name-to-animator-definition-map">#animator-name-to-animator-definition-map</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-1">4. Registering an Animator Definition</a> <a href="#ref-for-animator-name-to-animator-definition-map-2">(2)</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-3">5. Creating an Animator</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-4">6. Creating an Element Proxy</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-5">7. Requesting Animation Frames</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-6">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-animationworkletglobalscope-registeranimator">
+   <b><a href="#dom-animationworkletglobalscope-registeranimator">#dom-animationworkletglobalscope-registeranimator</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-1">2. Animation Worklet</a>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-2">4. Registering an Animator Definition</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-name-to-instance-map">
+   <b><a href="#animator-name-to-instance-map">#animator-name-to-instance-map</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-name-to-instance-map-1">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="parsing-a-property-list">
+   <b><a href="#parsing-a-property-list">#parsing-a-property-list</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-parsing-a-property-list-1">4. Registering an Animator Definition</a> <a href="#ref-for-parsing-a-property-list-2">(2)</a> <a href="#ref-for-parsing-a-property-list-3">(3)</a> <a href="#ref-for-parsing-a-property-list-4">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animator-instance-list">
+   <b><a href="#animator-instance-list">#animator-instance-list</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animator-instance-list-1">5. Creating an Animator</a> <a href="#ref-for-animator-instance-list-2">(2)</a>
+    <li><a href="#ref-for-animator-instance-list-3">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="elementproxy">
+   <b><a href="#elementproxy">#elementproxy</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-elementproxy-1">6. Creating an Element Proxy</a> <a href="#ref-for-elementproxy-2">(2)</a>
+    <li><a href="#ref-for-elementproxy-3">10. CSS Animator Notation</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-elementproxy-outputstylemap">
+   <b><a href="#dom-elementproxy-outputstylemap">#dom-elementproxy-outputstylemap</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-elementproxy-outputstylemap-1">6. Creating an Element Proxy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="update-proxy-input-style-map">
+   <b><a href="#update-proxy-input-style-map">#update-proxy-input-style-map</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-update-proxy-input-style-map-1">6. Creating an Element Proxy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="animation-requested-flag">
+   <b><a href="#animation-requested-flag">#animation-requested-flag</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-animation-requested-flag-1">3. Concepts</a>
+    <li><a href="#ref-for-animation-requested-flag-2">5. Creating an Animator</a>
+    <li><a href="#ref-for-animation-requested-flag-3">7. Requesting Animation Frames</a> <a href="#ref-for-animation-requested-flag-4">(2)</a> <a href="#ref-for-animation-requested-flag-5">(3)</a>
+    <li><a href="#ref-for-animation-requested-flag-6">8. Running Animators</a> <a href="#ref-for-animation-requested-flag-7">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="frame-requested">
+   <b><a href="#frame-requested">#frame-requested</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-frame-requested-1">7. Requesting Animation Frames</a> <a href="#ref-for-frame-requested-2">(2)</a>
+    <li><a href="#ref-for-frame-requested-3">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="frame-current">
+   <b><a href="#frame-current">#frame-current</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-frame-current-1">5. Creating an Animator</a>
+    <li><a href="#ref-for-frame-current-2">7. Requesting Animation Frames</a> <a href="#ref-for-frame-current-3">(2)</a>
+    <li><a href="#ref-for-frame-current-4">8. Running Animators</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="run-animators">
+   <b><a href="#run-animators">#run-animators</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-run-animators-1">8. Running Animators</a> <a href="#ref-for-run-animators-2">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="propdef-animator-root">
+   <b><a href="#propdef-animator-root">#propdef-animator-root</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-propdef-animator-root-1">6. Creating an Element Proxy</a>
+    <li><a href="#ref-for-propdef-animator-root-2">10. CSS Animator Notation</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="propdef-animator">
+   <b><a href="#propdef-animator">#propdef-animator</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-propdef-animator-1">6. Creating an Element Proxy</a>
+    <li><a href="#ref-for-propdef-animator-2">10. CSS Animator Notation</a>
+   </ul>
+  </aside>
+<script>/* script-dfn-panel */
+
+        document.body.addEventListener("click", function(e) {
+            var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
+            // Find the dfn element or panel, if any, that was clicked on.
+            var el = e.target;
+            var target;
+            var hitALink = false;
+            while(el.parentElement) {
+                if(el.tagName == "A") {
+                    // Clicking on a link in a <dfn> shouldn't summon the panel
+                    hitALink = true;
+                }
+                if(el.classList.contains("dfn-paneled")) {
+                    target = "dfn";
+                    break;
+                }
+                if(el.classList.contains("dfn-panel")) {
+                    target = "dfn-panel";
+                    break;
+                }
+                el = el.parentElement;
+            }
+            if(target != "dfn-panel") {
+                // Turn off any currently "on" or "activated" panels.
+                queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
+                    el.classList.remove("on");
+                    el.classList.remove("activated");
+                });
+            }
+            if(target == "dfn" && !hitALink) {
+                // open the panel
+                var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+                if(dfnPanel) {
+                    console.log(dfnPanel);
+                    dfnPanel.classList.add("on");
+                    var rect = el.getBoundingClientRect();
+                    dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+                    dfnPanel.style.top = window.scrollY + rect.top + "px";
+                    var panelRect = dfnPanel.getBoundingClientRect();
+                    var panelWidth = panelRect.right - panelRect.left;
+                    if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                        // Reposition, because the panel is overflowing
+                        dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+                    }
+                } else {
+                    console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+                }
+            } else if(target == "dfn-panel") {
+                // Switch it to "activated" state, which pins it.
+                el.classList.add("activated");
+                el.style.left = null;
+                el.style.top = null;
+            }
+
+        });
+        </script>
