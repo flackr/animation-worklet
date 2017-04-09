@@ -1,9 +1,8 @@
 <pre class='metadata'>
 Title:  CSS Animation Worklet API
-Status: ED
-Group: houdini
-ED: https://drafts.css-houdini.org/css-animation-api-1/
-Previous Version:
+Status: CG-DRAFT
+Group: WICG
+URL: https://wicg.github.io/animation-worklet/
 Shortname: css-animation-api
 Level: 1
 Abstract:
@@ -115,10 +114,14 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     Note: This is how the class should look.
     <pre class='lang-javascript'>
         class FooAnimator {
-            static get inputProperties() { return ['--foo']; }
-            static get outputProperties() { return ['transform']; }
+            static get elements() {
+                return [
+                    {name: 'foo', inputProperties: ['--foo'], outputProperties: []},
+                    {name: 'bar', inputProperties: [], outputProperties: ['transform']},
+                ];
+            };
 
-            animate(root, children, timeline) {
+            animate(elementMap, timeline) {
                 // Animation frame logic goes here
             }
         }
@@ -134,28 +137,32 @@ an <a>animator instance</a>. It consists of:
 
  - A <dfn>class constructor</dfn>.
 
- - A <dfn>animate function</dfn>.
- 
- - A <dfn>animator input property list</dfn>.
+ - An <dfn>animate function</dfn>.
 
- - A <dfn>animator output property list</dfn>.
+ - An <dfn>animator slot list</dfn> containing a dictionary providing each <dfn>slot name</dfn>,
+    its <dfn>input property list</dfn>, and its <dfn>output propert list</dfn>.
 
- - A <dfn>animator root input property list</dfn>.
 
- - A <dfn>animator root output property list</dfn>.
+Each entry in the animator slot list consists of:
+
+ - An <dfn>animator slot</dfn> <<ident>>#.
+
+ - An <dfn>animator input property list</dfn>.
+
+ - An <dfn>animator output property list</dfn>.
 
 
 An <dfn>animator instance</dfn> describes a fully realized custom animation instance in the worklet
 context and links an <a>animator definition</a> with the instance specific state such as its element
 proxies. It consists of:
 
- - A <dfn>animator name</dfn>.
+ - An <dfn>animator name</dfn> <<ident>>#.
 
  - An <a>animation requested flag</a>.
 
- - A <dfn>root element proxy</dfn>.
+ - A <dfn>root element</dfn>.
 
- - A list of associated <dfn>children element proxies</dfn>.
+ - An <dfn>element proxy map</dfn> mapping <a>animator slot</a> to a list of <a>element proxies</a>.
 
 
 An <dfn>element proxy</dfn> defines a handle to an element which can be used to read or
@@ -196,24 +203,11 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
     7. If the result of <a>IsCallable</a>(|animate|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    8. Let |inputProperties| be the result of <a>parsing a property list</a> with name
-        "inputProperties" for |animatorCtor|. If an exception is thrown, rethrow the exception and
-        abort all these steps.
-
-    9. Let |outputProperties| be the result of <a>parsing a property list</a> with name
-        "outputProperties" for |animatorCtor|. If an exception is thrown, rethrow the exception and
-        abort all these steps.
-
-    10. Let |rootInputProperties| be the result of <a>parsing a property list</a> with name
-        "rootInputProperties" for |animatorCtor|. If an exception is thrown, rethrow the exception
-        and abort all these steps.
-
-    11. Let |rootOutputProperties| be the result of <a>parsing a property list</a> with name
-        "rootOutputProperties" for |animatorCtor|. If an exception is thrown, rethrow the exception
-        and abort all these steps.
+    8. Let |elements| be the result of <a>parsing an animator slot list</a> for |animatorCtor|.
+        If an exception is thrown, rethrow the exception and abort all these steps.
 
 
-    12. Let |definition| be a new <a>animator definition</a> with:
+    9. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
 
@@ -221,31 +215,45 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 
         - <a>animate function</a> being |animate|
 
-        - <a>animator input property list</a> being |inputProperties|
-
-        - <a>animator input property list</a> being |outputProperties|
-
-        - <a>animator root input property list</a> being |rootInputProperties|
-
-        - <a>animator root output property list</a> being |rootOutputProperties|
+        - <a>element proxy map</a> being |elements|
 
 
-    13. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
+    10. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
         definition map</a> of the associated <a>document</a>.
 
 
 Issue: Todo: Describe how we can read scroll offsets. The previous approach was to list
 it as an input / output property of proxies but the new idea is to have a readonly ScrollTimeline.
 
-The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to instance map</dfn>. The map is
-populated when the user agent constructs a new <a>animator instance</a>.
+When <dfn>parsing an animator slot list</dfn> for {{animatorCtor}}, the user agent <em>must</em>
+run the following steps:
 
-When <dfn>parsing a property list</dfn> with name <em>name</em> for {{animatorCtor}},
+    1. Let |elements| be an empty <code>sequence&lt;Dictionary></code>.
+
+    1. Let |elementsIterable| be the result of <a>Get</a>(|animatorCtor|, |elements|).
+
+    2. If |elementsIterable| is not undefined, then for each |slot| in |elementsIterable| run the
+        following steps:
+
+        - Let |slotDictionary| be an empty dictionary.
+
+        - Let the |name| key of |slotDictionary| be the |name| value of |element|.
+
+        - Let the |inputProperties| key of |slotDictionary| be the result of
+            <a>parsing an animator property list</a> with name <em>inputProperties</em> for |slot|.
+
+        - Let the |outputProperties| key of |slotDictionary| be the result of
+            <a>parsing an animator property list</a> with name <em>outputProperties</em> for |slot|.
+
+        - Push |slotDictionary| onto |elements|.
+
+
+When <dfn>parsing an animator property list</dfn> with name <em>name</em> for <em>slot</em>,
 the user agent <em>must</em> run the following steps:
 
-    1. Let |properties| be an empty <code>sequence&lt;DOMString></code>
+    1. Let |properties| be an empty <code>sequence&lt;DOMString></code>.
 
-    2. Let |propertiesIterable| be the result of <a>Get</a>(|animatorCtor|, |name|).
+    2. Let |propertiesIterable| be the result of <a>Get</a>(|slot|, |name|).
 
     3. If |propertiesIterable| is not undefined, then set |properties| to the result of
         converting |propertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
@@ -259,32 +267,36 @@ Each <a>animator instance</a> lives in an {{AnimationWorkletGlobalScope}}. The
 <a>animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
 as it may contain the scripted animation state.
 
-The {{AnimationWorkletGlobalScope}} has an <dfn>animator instance list</dfn>. Anytime a new
-<a>animator instance</a> is constructed in that scope, it gets  added to the list.
+The {{AnimationWorkletGlobalScope}} has an <dfn>(animator name, root element) to instance map</dfn>.
+The map is populated when the user agent constructs a new <a>animator instance</a> in that scope.
 
-To <dfn>create a new animator instance</dfn> given a |root element|, |name|, and |workletGlobalScope|,
+To <dfn>create a new animator instance</dfn> given a |name|, |root element|, and |workletGlobalScope|,
 the user agent <em>must</em> run the following steps:
 
-    1. If an |animatorInstance| with the same |name| and |root element| exists within the <a>animator
-          instance list</a> then abort the following steps.
-
-    2. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-          <a>animator name to animator definition map</a>.
+    1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
+         <a>animator name to animator definition map</a>.
 
           If |definition| does not exist abort the following steps.
 
-    3. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
+    2. Let |animatorInstanceMap| be |workletGlobalScope|'s <a>(animator name, root element) to
+         instance map</a>.
 
-    4. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+    3. If an entry exists for |name| and |root element| within |animatorInstanceMap| then abort the
+         following steps.
 
-          Issue: handle invalid construction.
+    4. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
 
-    5. Set the following on |animatorInstance| with:
+    5. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+
+          If <a>Construct</a> throws an exception, set the result of looking up |name| and
+	    |root element| in |animatorInstanceMap| to <b>null</b>, and abort the following steps.
+
+    6. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
-
         - <a>animation requested flag</a> being <a>frame-current</a>
 
-    6. Add |animatorInstance| to <a>animator instance list</a>.
+    7. Set the result of looking up |name| and |root element| in |animatorInstanceMap| to
+         |animatorInstance|.
 
 
 Creating an Element Proxy {#creating-element-proxy}
@@ -309,32 +321,37 @@ the maps are those specified in registerAnimator for the given <a>animator insta
 Issue: Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
 cannot be constructed via javascript?
 
-When user agent wants to <dfn>create an element proxy</dfn> given |element|, it
+When user agent wants to <dfn>create an element proxy</dfn> given |element| with a given |animatorSlot|, it
 <em>must</em> run the following steps:
 
     1. Let |animatorInstance| be the <a>animator instance</a> associated with |element|
 
     2. Let |workletGlobalScope| be the scope associated with |animatorInstance|.
 
-    1. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s
+    3. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s
         <a>animator name to animator definition map</a>.
 
-    2. Let |inputProperties| be <a>animator input property list</a> of |definition|.
+    4. Let |slot| be the result of finding the item with name |animatorSlot| in the
+        <a>animator slot list</a> of |definition|.
 
-    3. Let |proxy| be a new {{ElementProxy}} Object with:
+    5. Let |inputProperties| be <a>animator input property list</a> of |slot|.
+
+    6. Let |outputProperties| be <a>animator output property list</a> of |slot|.
+
+    6. Let |proxy| be a new {{ElementProxy}} Object with:
 
         - <a>proxied element</a> being |element|.
 
-        - {{outputStyleMap}} being a new {{StylePropertyMap}}.
+        - {{outputStyleMap}} being a new {{StylePropertyMap}} for |outputProperties|.
 
-    4. <a>update proxy input style map</a> with |proxy| and |inputProperties|.
+    7. <a>update proxy input style map</a> with |proxy| and |inputProperties|.
 
-    5. Associate |proxy| with  |animatorInstance|.
+    8. Associate |proxy| with  |animatorInstance|.
 
-    5. Return proxy.
+    9. Return proxy.
 
 
-Note: Writing to the outputStyle map will update the effective value of the used style value of the 
+Note: Writing to the outputStyle map will update the effective value of the used style value of the
 <a>proxied element</a>. This <em>may</em> happen asynchronously.
 
 
@@ -376,9 +393,12 @@ For each <a>element proxy</a> for that element, perform the following steps:
     4. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s
         <a>animator name to animator definition map</a>.
 
-    5. Let |inputProperties| be <a>animator input property list</a> of |definition|.
+    5. Let |slot| be the result of finding the item with name |animatorSlot| in the
+        <a>animator slot list</a> of |definition|.
 
-    6. For each property in |inputProperties|, if the property’s computed value has changed, 
+    6. Let |inputProperties| be <a>animator input property list</a> of |slot|.
+
+    6. For each property in |inputProperties|, if the property’s computed value has changed,
         set the <a>animation requested flag</a> on the |animator| to <a>frame-requested</a>.
 
 
@@ -400,46 +420,42 @@ Note: The user agent is not required to run animations on every frame. It is leg
       provide a different service level according to their policy.
 
 
-When the user agent wants to <dfn>run animators</dfn>, it <em>must</em> iterates over <a>animator
-instance list</a> as |instance|:
+When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalScope|, it
+<em>must</em> iterate over all pairs of animator name and root element as (|animatorName|,
+|rootElement|). For each such pair:
 
-  1. If the <a>animation requested flag</a> for the instance is <a>frame-current</a>
-        or the proxies belonging to the |instance| will not be visible within the visual viewport
-        of the current frame the user agent <em>may</em> abort all the following steps.
+  1. Let the |definition| be the result of looking up |animatorName| on the |workletGlobalScope|'s
+        <a>animator name to animator definition map</a>.
+
+      If |definition| does not exist then abort the following steps.
+
+  2. Let |instance| be the result of looking up (|animatorName|, |rootElement|) in the
+        |workletGlobalScope|'s <a>(animator name, root element) to instance map</a>.
+
+      If |instance| does not exist then <a>create a new animator instance</a> for |animatorName|,
+      |rootElement|, and |workletGlobalScope|, and let |instance| be the result of that.
+
+  3. If |instance| still does not exist or |instance| is <b>null</b> then abort the following steps.
+
+  4. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the proxies
+        belonging to |instance| will not be visible within the visual viewport of the current frame
+	the user agent <em>may</em> abort all the following steps.
 
         Issue: Consider giving user agents permission to skip running animator instances to throttle
         slow animators.
 
-  2. Let |name| be the <a>animator name</a> of |instance|.
+  5. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  3. Let |workletGlobalScope| be a {{AnimationWorkletGlobalScope}} from the list of <a>worklet's
-        WorkletGlobalScopes</a> from the animation {{Worklet}}.
+  6. Let |timestamp| be a <a>DOMHighResTimeStamp</a> indicating the current frame start time.
 
-  4. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
+  7. Let |timeline| be a new {{AnimationTimeline}} with its "currentTime" set to |timestamp|.
 
-      If |definition| does not exist abort the following steps.
+  8. Let |elementMap| be an <a>element proxy map</a> of |instance|.
 
-  5. Let |animatorInstance| be the result of looking up |name| on |workletGlobalScope|'s
-        <a>animator name to instance map</a>. If |animatorInstance| is null run the following
-        substeps:
+  9. <a>Invoke</a> |animateFunction| with arguments «|elementMap|, |timeline|»,
+        and with |instance| as the <a>callback this value</a>.
 
-        Issue: Todo: Add steps to create new animatorInstance given the animator definition.
-
-  6. Let |animateFunction| be |definition|'s <a>animate function</a>.
-
-  9. Let |timestamp| be a <a>DOMHighResTimeStamp</a> indicating the current frame start time.
-
-  10. Let |timeline| be a new {{AnimationTimeline}} with its "currentTime" set to |timestamp|.
-
-  11. Let |root| be a <a>root element proxy</a> of |instance|.
-
-  12. Let |children| be a <a>children element proxies</a> of |instance|.
-
-  13. <a>Invoke</a> |animateFunction| with arguments «|root|, |children|, |timeline|»,
-        and with |animatorInstance| as the <a>callback this value</a>.
-
-Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times 
+Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
 in the same frame.
 
 Closing an Animator {#closing-animator}
@@ -451,13 +467,12 @@ Issue: Todo: Define when we may get rid of the animator.
 CSS Animator Notation {#css-animator-notation}
 ==============================================
 
-Two CSS properties 'animator-root' and 'animator' may be used to
-assign an HTML elements to an animator instance either as a root element or a child element.
-
+Two CSS properties 'animator-root' and 'animator' may be used to assign an HTML elements to an
+<a>animator instance</a> either as a root element or a child element.
 
 <pre class='propdef'>
 Name: animator-root
-Value:  [ none |  <<ident>> ]#
+Value:  none | [<a>animator name</a> <a>animator slot</a>, ]*
 Initial: none
 Applies to: all elements
 Inherited: no
@@ -470,22 +485,28 @@ Animatable: no
 <dl dfn-type=value dfn-for=animator-root>
     <dt><dfn>none</dfn>
     <dd>
-        There will be no animators.
-    <dt><dfn><<ident>></dfn>
+      There will be no <a>animator instance</a> that has this element as its
+      <a>root element</a>.
+    <dt><a>animator name</a> <a>animator slot</a>
     <dd>
-       If there is a <a>animator definition</a> registered with that name, then a new
-       <a>animator instance</a> will be created with this element as its <a>root element proxy</a>.
-       The new <a>animator instance</a> lifetime is tied to this root element's lifetime. If no <a>animator
-       definition</a> exists with that name, then the instance will be created as soon as one is
-       registered.
+      For each <a>animator name</a> specified in the list, the following applies for each animation frame:
+
+      * If there is no <a>animator definition</a> registered with the given <a>animator name</a>, the inclusion
+        of that <a>animator name</a> as a value has no effect.
+
+      * Otherwise, an <a>animator instance</a> with this element as its <a>root element</a>
+        will exist and will have its <a>animate function</a> called (with respect to the rules
+        laid out in [[#running-animators]]) with an <a>element proxy</a> for this element passed as
+        one of the <a>element proxies</a> for the given <a>animator slot</a>.
+
+      If the same <a>animator name</a> occurs multiple times in the list, only the first occurrence of that
+      <<ident>> is processed.
 </dl>
-
-
 
 <pre class='propdef'>
 Name: animator
-Value:  [ none |  <<ident>> ]#
-Initial: auto
+Value:  none | [<a>animator name</a> <a>animator slot</a>, ]*
+Initial: none
 Applies to: all elements
 Inherited: no
 Computed value: as specified
@@ -494,30 +515,27 @@ Media: interactive
 Animatable: no
 </pre>
 
-
 <dl dfn-type=value dfn-for=animator>
     <dt><dfn>none</dfn>
     <dd>
-        There will be no animators.
-    <dt><dfn><<ident>></dfn>
+      This element will not be passed into any <a>animate function</a> as one of the
+      <a>element proxies</a>.
+    <dt><a>animator name</a> <a>animator slot</a>
     <dd>
-      If there is a <a>animator definition</a> registered with that name, then this element is
-      assigned to the first ancestor animator instance of the given name as a child element proxy.
-      If no <a>animator definition</a> exists with that name, then the element gets assigned as soon
-      as one is registered.
+      For each <a>animator name</a> specified in the list, the following applies for each animation frame:
 
-      Issue: Todo: If no ancestor animator instance exists with that name then we should create one
-      with document root element as its root.
+      * If there is no <a>animator definition</a> registered with the given <a>animator name</a>, the inclusion
+        of that <a>animator name</a> as a value has no effect.
+
+      * Otherwise, an <a>element proxy</a> for this element will be passed into the
+        <a>animate function</a> of the closest ancestor <a>animator instance</a> with the given
+        <a>animator name</a> as one of the <a>element proxies</a> for the given <a>animator slot</a>. If no
+        such <a>animator instance</a> exists, one is created with the document root element as its
+        <a>root element</a>.
+
+      If the same <a>animator name</a> occurs multiple times in the list, only the first occurrence of that
+      <a>animator name</a> is processed.
 </dl>
-
-
-Note: All the elements in the root element's DOM sub-tree that get associated with the same animator
- name will get assigned to the the animator instance linked with this root element.
-
-
-Issue: Todo: Write the algorithm for element assignments. It will include construction of a new
-{{ElementProxy}}, looking up or creating animator instance, and assigning the animator. We probably
-need a diagram here too.
 
 
 Effect Stack {#effect-stack}
@@ -547,7 +565,7 @@ Example 1: A fade-in animation with spring timing. {#example-1}
 
 <pre class='lang-markup'>
 .myFadein {
-  animator:'spring-fadein';
+  animator: 'spring' 'fadein';
 }
 
 &lt;section class='myFadein'&gt;&lt;/section&gt;
@@ -561,16 +579,16 @@ document.animationWorklet.import('spring-timing.js');
 
 <pre class='lang-javascript'>
 // Inside AnimationWorkletGlobalScope
-registerAnimator('spring-fadein', class {
+registerAnimator('spring', class {
 
-    static inputProperties =  ['--spring-k'];
-    static outputProperties =  ['opacity'];
+    static elements = [
+        {name: 'fadein', inputProperties:  ['--spring-k'], outputProperties =  ['opacity']}];
     static inputTime = true;
 
-    animate(root, children, timeline) {
+    animate(elementMap, timeline) {
         this.startTime_ = this.startTime_ || timeline.currentTime;
         const deltaT = timeline.currentTime - this.startTime_;
-        children.forEach(elem => {
+        elementMap.get('fadein').forEach(elem => {
           // read a custom css property.
           const k = elem.inputStyleMap.get('--spring-k') || 1;
           // compute progress using a fancy spring timing function.
